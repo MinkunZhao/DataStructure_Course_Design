@@ -1,0 +1,16 @@
+﻿<Window x:Class="Ecosystem.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ecosystem"
+        mc:Ignorable="d"
+        Title="Main" Height="700" Width="1200" ResizeMode="NoResize">
+    <Grid x:Name="grid">
+        <!--
+        <Border BorderBrush="Gray" BorderThickness="50" Height="600" Width="1100">
+            <Canvas Width="1000" Height="500"  x:Name="canvas"  ></Canvas>
+        </Border>
+        -->
+    </Grid>
+</Window>

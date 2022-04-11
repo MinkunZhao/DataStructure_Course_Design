@@ -1,0 +1,43 @@
+﻿<Window x:Class="Ecosystem.ConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ecosystem"
+        mc:Ignorable="d"
+        Title="初始化设置" Height="450" Width="800">
+    <Grid>
+        <Button x:Name="confirm" Content="Confirm" HorizontalAlignment="Left" Margin="642,366,0,0" VerticalAlignment="Top" Height="23" Width="80" Click="btn_confirm_click"/>
+        <GroupBox Header="Generation" Margin="51,46,400,306">
+            <Grid Height="31">
+                <RadioButton Content="By Group" GroupName="Choice1" Margin="10,8,227,7" Checked="by_group_checked" IsChecked="True" />
+                <RadioButton Content="Randomly" GroupName="Choice1" Margin="124,8,110,7" Checked="randomly_checked" />
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Second tropical level" Margin="51,164,400,184">
+            <Grid>
+                <RadioButton Content="Horse" GroupName="Choice2" Margin="10,10,249,12" Checked="horse_checked" IsChecked="True"></RadioButton>
+                <RadioButton Content="Sheep" GroupName="Choice2" Margin="110,10,153,12" Checked="sheep_checked"></RadioButton>
+                <RadioButton Content="Rabbit" GroupName="Choice2" Margin="223,10,33,12" Checked="rabbit_checked"></RadioButton>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="Third tropical level" Margin="51,304,400,46">
+            <Grid>
+                <RadioButton Content="Tiger" GroupName="Choice3" Margin="29,10,230,12" Checked="tiger_checked" IsChecked="True"></RadioButton>
+                <RadioButton Content="Wolf" GroupName="Choice3" Margin="179,10,84,12" Checked="wolf_checked"></RadioButton>
+            </Grid>
+        </GroupBox>
+        <Label Content="Entity number" HorizontalAlignment="Left" Margin="539,46,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="number" HorizontalAlignment="Left" Margin="539,94,0,0" TextWrapping="Wrap" 
+                 VerticalAlignment="Top" Width="120" Text="100" 
+                 PreviewTextInput="limit_number" InputMethod.IsInputMethodEnabled="False"/>
+        <Label Content="Desired FrameRate" HorizontalAlignment="Left" Margin="539,147,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="desire_number" HorizontalAlignment="Left" Margin="539,190,0,0" TextWrapping="Wrap" 
+            VerticalAlignment="Top" Width="120" Text="60" 
+            PreviewTextInput="limit_number" InputMethod.IsInputMethodEnabled="False"/>
+        <Label Content="Ratio Of Three Nutritional level" HorizontalAlignment="Left" Margin="539,244,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="FirstRatio" HorizontalAlignment="Left" Margin="539,290,0,0" TextWrapping="Wrap" Text="5" VerticalAlignment="Top" Width="37"/>
+        <TextBox x:Name="SecondRatio" HorizontalAlignment="Left" Margin="599,290,0,0" TextWrapping="Wrap" Text="3" VerticalAlignment="Top" Width="37"/>
+        <TextBox x:Name="ThirdRatio" HorizontalAlignment="Left" Margin="664,290,0,0" TextWrapping="Wrap" Text="2" VerticalAlignment="Top" Width="36"/>
+    </Grid>
+</Window>
