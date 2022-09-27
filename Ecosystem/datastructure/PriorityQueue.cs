@@ -38,17 +38,32 @@ namespace Ecosystem.datastructure
             this.heap = new T[capacity];
         }
 
+        /**
+         * Function: Push the new element to the queue.
+         * Input: The element of specified type.
+         * Output: Empty.
+         */
         public void Push(T v)
         {
             heap[Count] = v;
             SiftUp(Count++);
         }
 
+        /**
+         * Function: Check whether the queue is empty.
+         * Input: Empty.
+         * Output: bool.
+         */
         public bool Empty()
         {
             return Count == 0;
         }
 
+        /**
+         * Function: Get the first element in the queue and delete it.
+         * Input: Empty.
+         * Output: The first element in the queue of specified type.
+         */
         public T Pop()
         {
             var v = Top();
@@ -57,12 +72,22 @@ namespace Ecosystem.datastructure
             return v;
         }
 
+        /**
+         * Function: Get the first element in the queue.
+         * Input: Empty.
+         * Output: The first element in the queue of specified type.
+         */
         public T Top()
         {
             if (Count > 0) return heap[0];
             throw new InvalidOperationException("The queue is empty!");
         }
 
+        /**
+         * Function: Construct the min heap so that the elements are arranged in order from bottom to top.
+         * Input: The number of elements.
+         * Output: Empty.
+         */
         void SiftUp(int n)
         {
             var v = heap[n];
@@ -70,6 +95,11 @@ namespace Ecosystem.datastructure
             heap[n] = v;
         }
 
+        /**
+         * Function: Construct the min heap so that the elements are arranged in order from top to bottom.
+         * Input: The number of elements.
+         * Output: Empty.
+         */
         void SiftDown(int n)
         {
             var v = heap[n];
@@ -99,17 +129,32 @@ namespace Ecosystem.datastructure
             }
         }
 
+        /**
+         * Function: Find the root of the tree to which the element belongs to.
+         * Input: The index of the element.
+         * Output: The root.
+         */
         public int Find(int curr)
         {
             if (array[curr] == curr) return curr;
             return array[curr] = Find(array[curr]);
         }
 
+        /**
+         * Function: Determines whether two elements belong to the same tree.
+         * Input: The indexs of the two elements.
+         * Output: bool
+         */
         public bool Differ(int a, int b)
         {
             return Find(a) != Find(b);
         }
 
+        /**
+         * Function: Add two elements to the same tree. 
+         * Input: The indexs of the two elements.
+         * Output: bool
+         */
         public void Union(int a, int b)
         {
             int root1 = Find(a);

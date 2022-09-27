@@ -10,18 +10,31 @@ namespace Ecosystem.algorithm
 {
     public class Generator
     {
+        /**
+         * Function: return the distance of two locations
+         * Input: Location a and Location b
+         * Output: distance
+         */
         public static double getDistance(Location a, Location b)
         {
             return Math.Sqrt(Math.Pow(a.Left - b.Left, 2) + Math.Pow(a.Top - b.Top, 2));
         }
 
-
+        /**
+         * Function: This function is to generate a random value according to the normal distribution
+         * Input: two random double value between 0 and 1 as assistant parameters, the mean value and the standard deviation
+         * Output: A random value that obeys the normal distribution
+         */
         public static double Normal_Rand(double t1, double t2, double miu, double sigma)
         {
             return miu + sigma * Math.Sqrt(-2 * Math.Log(t1)) * Math.Sin(2 * Math.PI * t2);
         }
 
-
+        /**
+         * Function: This function is to generate the initial positions of all plants and all animals.
+         * Input: The total number of all livings and the quantity ratio of each trophic level
+         * Output: All the initial coordinates of all livings' inital location
+         */
         public static List<LocationAndChoice> GetAllLocations(int number)
         {
             double Sum = ratioOfFirst + ratioOfSecond + ratioOfThird;
@@ -37,6 +50,7 @@ namespace Ecosystem.algorithm
 
             int minDistance_2and3;
             // the distance of 2nd and 3rd trophic levels's cluster should not be less than this value
+            // The following "if-else if..." operation is to avoid the initial position of herbivores' groups is too close to that of carnivores' groups.
             if (number <= 60)
                 minDistance_2and3 = 90;
             else if (number <= 100)
@@ -118,11 +132,9 @@ namespace Ecosystem.algorithm
                     t2 = rd.NextDouble();
                     tempY = Normal_Rand(t1, t2, centerY, 28);
                     if (tempY < 0)
-                        tempX = 0;
+                        tempY = 0;
                     else if (tempY > 490)
                         tempY = 490;
-                    // tempX = rd.NextDouble() * (2 * sizeOfGroups2[i] * 5) + (centerX - sizeOfGroups2[i] * 5);
-                    // tempY = rd.NextDouble() * (2 * sizeOfGroups2[i] * 5) + (centerY - sizeOfGroups2[i] * 5);
                     all_Loc.Add(new LocationAndChoice
                     {
                         Location = new Location { Left = tempX, Top = tempY },
@@ -182,8 +194,6 @@ namespace Ecosystem.algorithm
                         tempY = 0;
                     else if (tempY > 490)
                         tempY = 490;
-                    // tempX = rd.NextDouble() * (2 * sizeOfGroups3[i] * 7) + (centerX - sizeOfGroups3[i] * 7);
-                    // tempY = rd.NextDouble() * (2 * sizeOfGroups3[i] * 7) + (centerY - sizeOfGroups3[i] * 7);
                     all_Loc.Add(new LocationAndChoice
                     {
                         Location = new Location { Left = tempX, Top = tempY },

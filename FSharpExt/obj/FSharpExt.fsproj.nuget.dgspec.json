@@ -1,20 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "E:\\wpf try\\project(6)\\project\\FSharpExt\\FSharpExt.fsproj": {}
+    "D:\\Data Structures and Algorithm Analysis in C++\\Project\\project\\FSharpExt\\FSharpExt.fsproj": {}
   },
   "projects": {
-    "E:\\wpf try\\project(6)\\project\\FSharpExt\\FSharpExt.fsproj": {
+    "D:\\Data Structures and Algorithm Analysis in C++\\Project\\project\\FSharpExt\\FSharpExt.fsproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\wpf try\\project(6)\\project\\FSharpExt\\FSharpExt.fsproj",
+        "projectUniqueName": "D:\\Data Structures and Algorithm Analysis in C++\\Project\\project\\FSharpExt\\FSharpExt.fsproj",
         "projectName": "FSharpExt",
-        "projectPath": "E:\\wpf try\\project(6)\\project\\FSharpExt\\FSharpExt.fsproj",
-        "packagesPath": "C:\\Users\\地瓜\\.nuget\\packages\\",
-        "outputPath": "E:\\wpf try\\project(6)\\project\\FSharpExt\\obj\\",
+        "projectPath": "D:\\Data Structures and Algorithm Analysis in C++\\Project\\project\\FSharpExt\\FSharpExt.fsproj",
+        "packagesPath": "C:\\Users\\ZMK2002\\.nuget\\packages\\",
+        "outputPath": "D:\\Data Structures and Algorithm Analysis in C++\\Project\\project\\FSharpExt\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
         "configFilePaths": [
-          "C:\\Users\\地瓜\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ZMK2002\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

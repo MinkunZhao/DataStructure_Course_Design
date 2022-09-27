@@ -13,7 +13,7 @@ public partial class FirstNutritionalLevel
     public const int THRES_MOISTURE = 15;   // least moisture storage for propagation
     public const double ENERGY_BRINGTO_STL = 100;
 
-    public bool flag_OKToBread;
+    public bool flag_OKToBreed;
 
     public static int currentWeather_Flag;
 
@@ -21,6 +21,11 @@ public partial class FirstNutritionalLevel
     public int Illumination { get; set; }
     public int Moisture { get; set; }
 
+    /**
+     * Function: This function updates the relevant attributes (Age, Illumination, Moisture, flag_OKToBreed) of plants.
+     * Input: Empty
+     * Output: Empty
+     */
     public void StateUpdate()
     {
         if (currentWeather_Flag == 1)    // sunny
@@ -45,8 +50,8 @@ public partial class FirstNutritionalLevel
         }
 
         if (Age >= 3 && Age <= 13 && Illumination >= THRES_ILLUMINATION && Moisture >= THRES_MOISTURE)
-            flag_OKToBread = true;
+            flag_OKToBreed = true;
         else
-            flag_OKToBread = false;
+            flag_OKToBreed = false;
     }
 }

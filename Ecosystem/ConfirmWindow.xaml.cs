@@ -24,6 +24,9 @@ public partial class ConfirmWindow : Window
 {
     public ConfirmWindow() => InitializeComponent();
 
+    /**
+     * Function: react to the click of confirm button
+     */
     private void btn_confirm_click(object sender, RoutedEventArgs e)
     {
         Number = int.Parse(number.Text);
@@ -33,29 +36,58 @@ public partial class ConfirmWindow : Window
         ratioOfThird = int.Parse(ThirdRatio.Text);
         WindowObject.GetWindow().panel.Show();
         WindowObject.GetWindow().mainWindow.Show();
-        /*
-        MessageBox.Show(
-            string.Format("Your choice is:\n{0}, {1}, {2}, {3}", 
-                FirstChoice,
-                SecondChoice,
-                ThirdChoice,
-                Number),
-            "result");
-        */
         this.Close();
     }
 
+    /**
+     * Function: react to the click of radio button named By Group
+     */
     private void by_group_checked(object sender, RoutedEventArgs e) => FirstChoice = Generation.ByGroup;
+
+    /**
+     * Function: react to the click of radio button named Randomly
+     */
     private void randomly_checked(object sender, RoutedEventArgs e) => FirstChoice = Generation.Randomly;
+
+    /**
+     * Function: react to the click of radio button named Horse
+     */
     private void horse_checked(object sender, RoutedEventArgs e) => SecondChoice = SecondLevel.Horse;
+
+    /**
+     * Function: react to the click of radio button named Sheep
+     */
     private void sheep_checked(object sender, RoutedEventArgs e) => SecondChoice = SecondLevel.Sheep;
+
+    /**
+     * Function: react to the click of radio button named Rabbit
+     */
     private void rabbit_checked(object sender, RoutedEventArgs e) => SecondChoice = SecondLevel.Rabbit;
+
+    /**
+     * Function: react to the click of radio button named Tiger
+     */
     private void tiger_checked(object sender, RoutedEventArgs e) => ThirdChoice = ThirdLevel.Tiger;
+
+    /**
+     * Function: react to the click of radio button named Wolf
+     */
     private void wolf_checked(object sender, RoutedEventArgs e) => ThirdChoice = ThirdLevel.Wolf;
 
+    /**
+     * Function: limit the input field
+     */
     private void limit_number(object sender, TextCompositionEventArgs e)
     {
         Regex re = new Regex("[^0-9]+");
         e.Handled = re.IsMatch(e.Text);
+    }
+
+    /**
+     * Function: react to the click of help button
+     */
+    private void help_click(object sender, RoutedEventArgs e)
+    {
+        new HelpPage().ShowDialog();
     }
 }

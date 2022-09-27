@@ -18,24 +18,22 @@ using FSharpExt;
 
 namespace Ecosystem
 {
-    /// <summary>
-    /// ControlPanel.xaml 的交互逻辑
-    /// </summary>
     public partial class ControlPanel : Window
     {
-        
         public ControlPanel()
         {
             circle = new Ellipse{Width = 20, Height = 20};
             circle.Fill = Brushes.Transparent;
             circle.Stroke = Brushes.Black;
             circle.StrokeThickness = 2;
-            //canvasObject.Children.Add(circle);
             this.Top = 80;
             this.Left = 1200;
             InitializeComponent();
         }
 
+        /**
+         * Function: react to the click of start button
+         */
         private async void start_click(object sender, RoutedEventArgs e)
         {
             Stop = false;
@@ -68,7 +66,7 @@ namespace Ecosystem
                         this.energy_information.Text = tracedObject.entity.Energy.ToString();
                         this.tiredness_information.Text = tracedObject.entity.Tiredness.ToString();
                         this.age_information.Text = tracedObject.entity.Age.ToString();
-                        
+                        this.action_label.Text = tracedObject.current_action.ToString();
                         circle.SetValue(Canvas.LeftProperty, x - 5);
                         circle.SetValue(Canvas.TopProperty, y - 5);
                     }
@@ -76,6 +74,9 @@ namespace Ecosystem
             }
         }
 
+        /**
+         * Function: react to the click of stop button
+         */
         private void stop_click(object sender, RoutedEventArgs e)
         {
             Stop = true;
@@ -83,6 +84,9 @@ namespace Ecosystem
             btn_start.IsEnabled = true;
         }
 
+        /**
+         * Function: react to the button named generate statistic report
+         */
         private void Statistics_Click(object sender, RoutedEventArgs e)
         {
             var filename = fileNameBox.Text;
@@ -100,6 +104,9 @@ namespace Ecosystem
             );
         }
 
+        /**
+         * Function: react to the click of button named cancel information
+         */
         private void btn_cancel_Click(object sender, RoutedEventArgs e)
         {
             tracedObject = null;
@@ -112,6 +119,11 @@ namespace Ecosystem
             this.y_location.Text = "------";
             if(canvasObject.Children.Contains(circle))
                 canvasObject.Children.Remove(circle);
+        }
+
+        private void help_click(object sender, RoutedEventArgs e)
+        {
+            new HelpPage2().ShowDialog();
         }
     }
 }

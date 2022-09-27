@@ -1,0 +1,20 @@
+﻿<Window x:Class="Ecosystem.HelpPage2"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ecosystem"
+        mc:Ignorable="d"
+        Title="HelpPage" Height="450" Width="800">
+    <Grid>
+        <RichTextBox VerticalScrollBarVisibility="Visible"
+                     Margin="10,10,10,10" Cursor="Arrow" IsReadOnly="True">
+            <FlowDocument>
+                <Paragraph>
+                    <Run
+                        x:Name="rich_text" Text="" FontSize="20"/>
+                </Paragraph>
+            </FlowDocument>
+        </RichTextBox>
+    </Grid>
+</Window>

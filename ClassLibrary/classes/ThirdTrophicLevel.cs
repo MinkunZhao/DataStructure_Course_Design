@@ -13,7 +13,7 @@ public partial class ThirdTrophicLevel
     public const double MAX_TIREDNESS = 100;
     public const int THRES_AGE = MAX_AGE / 2;
     public const double THRES_ENERGY = MAX_ENERGY * 0.6;
-    public const double THRES_TIRENESS = MAX_TIREDNESS * 0.6;
+    public const double THRES_TIRENESS = MAX_TIREDNESS * 0.8;
 
     public int Age { get; set; }
     public double Energy { get; set; }

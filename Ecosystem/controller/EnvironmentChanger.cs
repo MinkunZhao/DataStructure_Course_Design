@@ -10,27 +10,53 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Ecosystem.controller
 {
     public class EnvironmentChanger
     {
+        /**
+         * Function: Generate the weather for each tick randomly according to the probabailty ratio set before.
+         * Input:Empty
+         * Output: Empty
+         */
         public static async void EnvironmentChange()
         {
             Random rd = new Random();
             double t = rd.NextDouble();
             if (t < 0.6)
-                GlobalWeather = Weather.Sunny;
+            {
+                GlobalWeather = Weather.Sunny;  //probability: 60%
+                Uri uri = new Uri(@"/image/sunny.jpeg", UriKind.Relative);
+                image.Source = new BitmapImage(uri);
+            }
             else if (t < 0.73)
-                GlobalWeather = Weather.Rainy;
+            {
+                GlobalWeather = Weather.Rainy;  // probability: 13%
+                Uri uri = new Uri(@"/image/rainy.jpeg", UriKind.Relative);
+                image.Source = new BitmapImage(uri);
+            }
             else if (t < 0.98)
-                GlobalWeather = Weather.Windy;
+            {
+                GlobalWeather = Weather.Windy;  // probability: 25%
+                Uri uri = new Uri(@"/image/windy.jpeg", UriKind.Relative);
+                image.Source = new BitmapImage(uri);
+            }
             else
-                GlobalWeather = Weather.Snowy;
-
+            {
+                GlobalWeather = Weather.Snowy;  // probability: 2%
+                Uri uri = new Uri(@"/image/snowy.jpeg", UriKind.Relative);
+                image.Source = new BitmapImage(uri);
+            }
             FirstNutritionalLevel.currentWeather_Flag = (int)GlobalWeather;
         }
-        
+
+        /**
+         * Function: Construct the newly generated entities produced by the propagation mechanism and present them on UI based on the returned locations.
+         * Input: Empty
+         * Output: Empty
+         */
         public static async void Propagate()
         {
             var proloc = await PropagationFn();
@@ -53,9 +79,12 @@ namespace Ecosystem.controller
                 }
             }
         }
-        
 
-        //The function is used for propagation.The function will return the locations of the newly built entities.
+        /**
+         * Function: The function is used for propagation.The function will return the locations of the newly built entities.
+         * Input: Empty
+         * Output: The locations of the newly generated entities at different nutritional level.
+         */
         public static Task<List<LocationAndChoice>> PropagationFn()
         {
             //This defines three list for storing the locations of the entities for three different trophic levels.
@@ -73,7 +102,7 @@ namespace Ecosystem.controller
                     case FNLHelper o1:
                     {
                         FirstNutritionalLevel entity = o1.entity;
-                        if (!entity.flag_OKToBread)
+                        if (!entity.flag_OKToBreed)
                              continue;
                         locationsByType[0].Add(o1.location);
                     }
@@ -99,31 +128,6 @@ namespace Ecosystem.controller
                     }
                         break;
                 }
-                /*
-                if (o.GetType() == typeof(FNLHelper))
-                {
-                    Location lc = ((FNLHelper)o).location;
-                    locationsByType[0].Add(lc);
-                }
-                else if (o.GetType() == typeof(STLHelper))
-                {
-                    SecondTrophicLevel entity = ((STLHelper)o).entity;
-                    if (entity.Age < 0.3 * SecondTrophicLevel.MAX_AGE ||
-                        entity.Age > 0.7 * SecondTrophicLevel.MAX_AGE)
-                        continue;
-                    Location lc = ((STLHelper)o).location;
-                    locationsByType[1].Add(lc);
-                }
-                else
-                {
-                    ThirdTrophicLevel entity = ((TTLHelper)o).entity;
-                    if (entity.Age < 0.3 * ThirdTrophicLevel.MAX_AGE ||
-                        entity.Age > 0.7 * ThirdTrophicLevel.MAX_AGE)
-                        continue;
-                    Location lc = ((TTLHelper)o).location;
-                    locationsByType[2].Add(lc);
-                }
-                */
 
             }
 
@@ -146,10 +150,14 @@ namespace Ecosystem.controller
                 //for the first trophic level, randomly create new entities in some places to keep them scattered.
                 if (i == 0)
                 {
-                    //繁殖概率与当前种群数量有关，数量越多繁殖概率越低，防止无脑增殖。
+                    /*
+                     * The propagation probability is related to the current population.
+                     * The more the population, the lower the propagation probability, so as to prevent propagating too fast.
+                     */
                     double sum = ratioOfFirst + ratioOfSecond + ratioOfThird;
                     double poss = 0.25 / (FirstNutritionalLevel.Count * sum / ratioOfFirst / Number);
                     int num = (int) (locationsByType[0].Count * poss);
+                    //Construct the list of the locations and the level of the entities
                     for (int j = 0; j < num; j++)
                     {
                         LocationAndChoice lac = new LocationAndChoice
@@ -168,9 +176,12 @@ namespace Ecosystem.controller
 
             return Task.FromResult(result);
         }
-        
 
-        //This function is used for get the new locations in different level.
+        /**
+         * Function: This function is used for get the new locations in different level.
+         * Input: The locations of the entities, the nutritional level they belongs to and the given value of radius(default 30).
+         * Output: The locations of the newly generated entities.
+         */
         public static List<Location> GetNewPositions(List<Location> locations, int level, int radius = 30)
         {
             List<Location> result = new List<Location>();
@@ -179,28 +190,63 @@ namespace Ecosystem.controller
 
 
             /*
-             *For every group, the proability for propagtion is from 0.3 to 0.7.
-             *The higher the number, the higher the probability.
-             *For the first trophic level, the proability is just 0.3. 
+             *For every group, the proability for propagtion is related to the population of the group.
+             *The higher the number, the lower the probability.
+             *For the first trophic level, the proability is just smaller. 
              */
             var rd = new Random();
             double poss = 0;
             double sum = ratioOfFirst + ratioOfSecond + ratioOfThird;
             if (level == 0)
             {
-                //繁殖概率与当前种群数量有关，数量越多繁殖概率越低，防止无脑增殖。
+                /*
+                 * The propagation probability is related to the current population.
+                 * The more the population, the lower the propagation probability, so as to prevent propagating too fast.
+                 */
+                if (ratioOfFirst == 0)
+                {
+                    return result;
+                }
                 poss = 0.25 / (FirstNutritionalLevel.Count * sum / ratioOfFirst / Number);
                 Console.WriteLine(poss);
             }
             else if (level == 1)
             {
-                //繁殖概率与当前种群数量有关，数量越多繁殖概率越低，防止无脑增殖。
-                poss = 1 / (SecondTrophicLevel.Count * sum / ratioOfSecond / Number);
+                /*
+                 * The propagation probability is related to the current population.
+                 * The more the population, the lower the propagation probability, so as to prevent propagating too fast.
+                 */
+                if (SecondTrophicLevel.Count == 0)
+                {
+                    return result;
+                }
+                else if (ratioOfFirst == 0)
+                {
+                    poss = 0;
+                }
+                else
+                {
+                    poss = 1 / (SecondTrophicLevel.Count * sum / ratioOfSecond / Number) * FirstNutritionalLevel.Count * ratioOfSecond / SecondTrophicLevel.Count / ratioOfFirst;
+                }
             }
             else
             {
-                //繁殖概率与当前种群数量有关，数量越多繁殖概率越低，防止无脑增殖。
-                poss = 1 / (ThirdTrophicLevel.Count * sum / ratioOfThird / Number);
+                /*
+                   * The propagation probability is related to the current population.
+                   * The more the population, the lower the propagation probability, so as to prevent propagating too fast.
+                   */
+                if (ThirdTrophicLevel.Count == 0)
+                {
+                    return result;
+                }
+                else if (ratioOfSecond == 0)
+                {
+                    poss = 0;
+                }
+                else
+                {
+                    poss = 1 / (ThirdTrophicLevel.Count * sum / ratioOfThird / Number) * SecondTrophicLevel.Count * ratioOfThird / ThirdTrophicLevel.Count / ratioOfSecond;
+                }
             }
             foreach (int i in group.Keys)
             {
@@ -225,7 +271,11 @@ namespace Ecosystem.controller
             return result;
         }
 
-        //This function is used for distinguish between different groups within the same species based on root nodes.
+        /**
+         * Function: This function is used for distinguish between different groups within the same species based on root nodes.
+         * Input: The locations of the entities of specified species and the given value of radius.
+         * Output: A dictionary data structure which stores the locations of the current entities in different groups.
+         */
         public static Dictionary<int, List<Location>> Group(List<Location> position, int radius)
         {
             Dictionary<int, List<Location>> result = new Dictionary<int, List<Location>>();

@@ -13,25 +13,13 @@ namespace Ecosystem.controller
 {
     public class Chooser
     {
+        /**
+         * Function: let every animal in screen choose an action and act it
+         * Input: Empty
+         * Output: Empty
+         */
         public static async Task ChooseAndAction()
         {
-            /*
-            foreach (var animal in AllAnimal)
-            {
-                var random = new Random();
-                var XDirection = random.Next(0, 50) - 25;
-                var YDirection = random.Next(0, 50) - 25;
-                switch (animal)
-                {
-                    case STLHelper obj2:
-                        Moving(obj2, XDirection, YDirection);
-                        break;
-                    case TTLHelper obj3:
-                        Moving(obj3, XDirection, YDirection);
-                        break;
-                }
-            }
-            */
             foreach (var o in AllAnimal)
             {
                 switch (o)
@@ -47,9 +35,14 @@ namespace Ecosystem.controller
             //return Task.CompletedTask;
         }
 
+        /**
+         * Function: Realize the action decision of the current second nutritional level entity.
+         * Input: The object presents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void STLChooser(STLHelper sobj)
         {
-            //先将ObjectInSight里面的按营养级存起来，根据这个做判断
+            //First save the entities in objectinsight according to their level, and judge according to this
             List<FNLHelper> firstLevels = new List<FNLHelper>();
             List<STLHelper> secondLevels = new List<STLHelper>();
             List<TTLHelper> thirdLevels = new List<TTLHelper>();
@@ -77,63 +70,90 @@ namespace Ecosystem.controller
                         break;
                 }
             }
-            //如果有第三营养级（逃跑）
+            //If there is a third nutritional level entity (escape)
             if (thirdLevels.Count != 0)
             {
+                sobj.current_action = GlobalObject.Action.Escape;
                 STLEscape(sobj);
             }
-            //体力不足，休息
+            //Tiredness is high and have a rest.
             else if (sobj.entity.Tiredness > SecondTrophicLevel.THRES_TIRENESS)
             {
+                sobj.current_action = GlobalObject.Action.Stay;
                 STLStay(sobj);
             }
-            //能量不足，捕食
+            //Lack of energy, hunt.
             else if (sobj.entity.Energy < SecondTrophicLevel.THRES_ENERGY)
             {
-                //先判断第二营养级与第一营养级的数量比，如果二比一多了很多，就要先放过第一营养级，不然第一营养级被吃完了
+                /*First judge the quantity ratio between the second nutritional level and the first nutritional level.
+                 * If there is much more entities at second nutritional level, 
+                 * stop predation to prevent the number of first nutritional level decreases quickly.
+                 */
                 if (SecondTrophicLevel.Count * 1.0 / FirstNutritionalLevel.Count < 2 * ratioOfFirst / ratioOfSecond)
                 {
+                    sobj.current_action = GlobalObject.Action.Hunt;
                     STLHunt(sobj);
                 }
                 else
                 {
+                    sobj.current_action = GlobalObject.Action.Run;
                     STLRun(sobj);
                 }
             }
-            //集群
-            //这里我将集群规则改了，改成根据当前这一物种在所有生物中所占的比例与初始时定义的5:3:2的比例作比较，如果比例减小了就集群，因为没有集群有利于繁殖
-            //如果按照原来的大于4就集群容易出现数量多时会一直选择集群
+            /*When the proportion of the number of nutrition level the current entity belongs to is small,
+             *the aggregation mechanism is triggered.
+             */
             else if ((double)SecondTrophicLevel.Count / AllAnimal.Count < ratioOfSecond / (sum + 1))
             {
+                sobj.current_action = GlobalObject.Action.GetTogether;
                 STLGetTogether(sobj);
             }
+            // Random action
             else
             {
                 var rand = new Random();
                 if (rand.NextDouble() < 0.3)
+                {
+                    sobj.current_action = GlobalObject.Action.Seek;
                     STLSeek(sobj);
+                }
+                else if(rand.NextDouble() < 0.5)
+                {
+                    sobj.current_action = GlobalObject.Action.GetTogether;
+                    STLGetTogether(sobj);
+                }
                 else
+                {
+                    sobj.current_action = GlobalObject.Action.Run;
                     STLRun(sobj);
+                }
             }
         }
 
+        /**
+         * Function: Realize the action decision of the current third nutritional level entity.
+         * Input: The object presents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void TTLChooser(TTLHelper tobj)
         {
             double sum = ratioOfFirst + ratioOfSecond + ratioOfThird;
             if (tobj.entity.Tiredness > ThirdTrophicLevel.THRES_TIRENESS)    // it is tired
             {
+                tobj.current_action = GlobalObject.Action.Stay;
                 TTLStay(tobj);
             }
 
             else if (tobj.entity.Energy < ThirdTrophicLevel.THRES_ENERGY)   // it is hungry
             {
-                //先判断第三营养级与第二营养级的数量比，如果三比二多了很多，就要先放过第二营养级，不然第二营养级被吃完了
                 if (ThirdTrophicLevel.Count * 1.0 / SecondTrophicLevel.Count < 2 * ratioOfThird / ratioOfSecond)
                 {
+                    tobj.current_action = GlobalObject.Action.Hunt;
                     TTLHunt(tobj);
                 }
-                else
+                else // If the number of the 3rd trophic level is much more than that of the 2nd trophic level, then the predators let the preys go temporarily, otherwise the 2nd nutritional level will be eaten up
                 {
+                    tobj.current_action = GlobalObject.Action.Run;
                     TTLRun(tobj);
                 }
             }
@@ -145,46 +165,63 @@ namespace Ecosystem.controller
                 {
                     if (o is TTLHelper) companionInSight++;
                 }
-                //集群
-                //这里我将集群规则改了，改成根据当前这一物种在所有生物中所占的比例与初始时定义的5:3:2的比例作比较，如果比例减小了就集群，因为没有集群有利于繁殖
-                //如果按照原来的大于4就集群容易出现数量多时会一直选择集群
-                    if ((double)ThirdTrophicLevel.Count / AllAnimal.Count < ratioOfThird / (sum + 1))   // there are many companions in its sight
+                /* Compare the current quantity ratio of the this species with the initial one (default: 5:3:2).
+                 * If it is greatly smaller than the initial ratio, then this species choose to get together.
+                 * Because aggregation is beneficial for the animals to propagate and survive.
+                 */
+                if ((double)ThirdTrophicLevel.Count / AllAnimal.Count < ratioOfThird / (sum + 1))   // there are many companions in its sight
+                {
+                    tobj.current_action = GlobalObject.Action.GetTogether;
+                    TTLGetTogether(tobj);
+                }
+                // Random action
+                else
+                {
+                    var rand = new Random();
+                    if (rand.NextDouble() < 0.3)
                     {
+                        tobj.current_action = GlobalObject.Action.Seek;
+                        TTLSeek(tobj);
+                    }
+                    else if (rand.NextDouble() < 0.5)
+                    {
+                        tobj.current_action = GlobalObject.Action.GetTogether;
                         TTLGetTogether(tobj);
                     }
                     else
                     {
-                        var rand = new Random();
-                        if (rand.NextDouble() < 0.3)
-                            TTLSeek(tobj);
-                        else
-                            TTLRun(tobj);
+                        tobj.current_action = GlobalObject.Action.Run;
+                        TTLRun(tobj);
                     }
+                }
             }
         }
 
+        /**
+         * Function: The entity will only stay where it is and will not move.
+         * Input: The object presents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void STLStay(STLHelper stl)
         {
-            /*//一开始讨论设定的速度阈值，可以后期调
-            double V0 = 25;
-            stl.entity.Tiredness -= V0;
-            stl.entity.Tiredness = stl.entity.Tiredness < 0 ? 0 : stl.entity.Tiredness;
-            stl.entity.Energy -= V0 * 0.3;
-            // 原地休息时饿得比移动时慢一些，所以这里的参数应设得比Updater里的参数小一些*/
             stl.entity.Tiredness = 0;
         }
 
+        /**
+         * Function: The entity will only stay where it is and will not move.
+         * Input: The object presents the entity at third nutritional level.
+         * Output: Empty
+         */
         public static void TTLStay(TTLHelper ttl)
         {
-            /*//一开始讨论设定的速度阈值，可以后期调
-            double V0 = 30;
-            ttl.entity.Tiredness -= V0;
-            ttl.entity.Tiredness = ttl.entity.Tiredness < 0 ? 0 : ttl.entity.Tiredness;
-            ttl.entity.Energy -= V0 * 0.3;
-            // 原地休息时饿得比移动时慢一些，所以这里的参数应设得比Updater里的参数小一些*/
             ttl.entity.Tiredness = 0;
         }
 
+        /**
+         * Function: (Aggregation Function) Control the second nutritional level's animals to get together.
+         * Input: The object presents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void STLGetTogether(STLHelper stl)
         {
             Random rd = new Random();
@@ -205,26 +242,38 @@ namespace Ecosystem.controller
             centerY = (centerY + stl.location.Top) / (companionInSight + 1);
             double targetX = rd.NextDouble() * 2 * 0.5 * MAX_SIGHT_RANGE + centerX - 0.5 * MAX_SIGHT_RANGE;
             double targetY = rd.NextDouble() * 2 * 0.5 * MAX_SIGHT_RANGE + centerY - 0.5 * MAX_SIGHT_RANGE;
-            // 参数0.5后期需要调
 
-            //设置速度阈值为15
-            double V0 = 35;
-            //根据那个公式得出速度的最大值，这里a设为0.1
+            // speed threshold value
+            double V0 = 0;
+            switch (SecondChoice)
+            {
+                case SecondLevel.Horse:
+                    V0 = 35;
+                    break;
+                case SecondLevel.Rabbit:
+                    V0 = 30;
+                    break;
+                case SecondLevel.Sheep:
+                    V0 = 33;
+                    break;
+            }
+            // calculated max speed according to the formula (set parameter a to 0.1)
             double Vmax = V0 + 0.1 * stl.entity.State;
-            //在0.7的速度阈值与最大值之间随机选择一个值作为当前速度，因为运动时间为1秒，速度与移动距离movement相等
+            // select a random speed between 0.7 times threshold speed and the max speed as the current speed
+            // Since the moving time is 1 second, the value of movement equals to the value of speed
             double movement = 0.7 * V0 + new Random().NextDouble() * (Vmax - 0.7 * V0);
-            //速度最大不得超过20
+            // speed cannot more than 20
             movement = movement > 20 ? 20 : movement;
-            //速度最小不得低于0.7V0
+            // speed cannot less than 0.7V0
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
 
-            //朝着目标中心移动movement距离
+            // move towards the center of target
             double dis = SqrtSumSquare(targetX - stl.location.Left, targetY - stl.location.Top);
             double LeftOffset = (targetX - stl.location.Left) * movement / dis;
             double TopOffset = (targetY - stl.location.Top) * movement / dis;
  
 
-            //越界检查
+            // Out of the map's bound is not allowed.
             if (stl.location.Left + LeftOffset < 0)
             {
                 LeftOffset = 0 - stl.location.Left;
@@ -244,12 +293,17 @@ namespace Ecosystem.controller
             Moving(stl, LeftOffset,TopOffset);
 
 
-            //直接在这里更新能量和疲劳度，因为在update那里很难获取移动距离
+            // Update the energy and tiredness here directly because passing parameters such as movement is quite hard.
             stl.entity.Energy -= movement * 1.5;
             stl.entity.Tiredness += movement * 0.1;
             stl.entity.Tiredness = stl.entity.Tiredness < 0 ? 0 : stl.entity.Tiredness;
         }
 
+        /**
+         * Function: (Aggregation Function) Control the second nutritional level's animals to get together.
+         * Input: The object presents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void TTLGetTogether(TTLHelper ttl)
         {
             Random rd = new Random();
@@ -271,26 +325,33 @@ namespace Ecosystem.controller
             double targetX = rd.NextDouble() * 2 * 0.5 * MAX_SIGHT_RANGE + centerX - 0.5 * MAX_SIGHT_RANGE;
             double targetY = rd.NextDouble() * 2 * 0.5 * MAX_SIGHT_RANGE + centerY - 0.5 * MAX_SIGHT_RANGE;
 
-            // 参数0.5后期需要调
-
-            //设置速度阈值为20，比第二营养级快，使第三营养级能够追上第二营养级
-            double V0 = 40;
-            //根据那个公式得出速度的最大值，这里a设为0.1
+            // speed threshold value (greater than that of the 2nd trophic level in order to ensure the predators can catch up with the preys)
+            double V0 = 0;
+            switch (ThirdChoice)
+            {
+                case ThirdLevel.Tiger:
+                    V0 = 45;
+                    break;
+                case ThirdLevel.Wolf:
+                    V0 = 40;
+                    break;
+            }
+            // calculated max speed according to the formula (set parameter a to 0.1)
             double Vmax = V0 + 0.1 * ttl.entity.State;
-            //在0.7的速度阈值与最大值之间随机选择一个值作为当前速度，因为运动时间为1秒，速度与移动距离movement相等
+            // select a random speed between 0.7 times threshold speed and the max speed as the current speed
+            // Since the moving time is 1 second, the value of movement equals to the value of speed
             double movement = 0.7 * V0 + new Random().NextDouble() * (Vmax - 0.7 * V0);
-            //速度最大不得超过25
+            // speed cannot more than 25
             movement = movement > 25 ? 25 : movement;
-            //速度最小不得低于0.7V0
+            // speed cannot less than 0.7V0
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
 
-
-            //朝着目标中心移动movement距离
+            // move towards the center of target
             double dis = SqrtSumSquare(targetX - ttl.location.Left, targetY - ttl.location.Top);
             double LeftOffset = (targetX - ttl.location.Left) * movement / dis;
             double TopOffset = (targetY - ttl.location.Top) * movement / dis;
 
-            //越界检查
+            // Out of the map's bound is not allowed.
             if (ttl.location.Left + LeftOffset < 0)
             {
                 LeftOffset = 0 - ttl.location.Left;
@@ -310,23 +371,37 @@ namespace Ecosystem.controller
             Moving(ttl, LeftOffset, TopOffset);
 
 
-            //直接在这里更新能量和疲劳度，因为在update那里很难获取移动距离
+            // Update the energy and tiredness here directly because passing parameters such as movement is quite hard.
             ttl.entity.Energy -= movement;
             ttl.entity.Tiredness += movement * 0.1;
             ttl.entity.Tiredness = ttl.entity.Tiredness < 0 ? 0 : ttl.entity.Tiredness;
         }
 
+        /**
+         * Function: Realize the escape mechanism of the entity at second nutritional level.
+         * Input: The object represents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void STLEscape(STLHelper stl)
         {
-            //设置速度阈值为15
-            double V0 = 35;
-            //根据那个公式得出速度的最大值，这里a设为0.1
+            //Calculate the velocity according to the formula.
+            double V0 = 0;
+            switch (SecondChoice)
+            {
+                case SecondLevel.Horse:
+                    V0 = 35;
+                    break;
+                case SecondLevel.Rabbit:
+                    V0 = 30;
+                    break;
+                case SecondLevel.Sheep:
+                    V0 = 33;
+                    break;
+            }
             double Vmax = V0 + 0.1 * stl.entity.State;
-            //在0.7的速度阈值与最大值之间随机选择一个值作为当前速度，因为运动时间为1秒，速度与移动距离movement相等
             double movement = 0.7 * V0 + new Random().NextDouble() * (Vmax - 0.7 * V0);
-            //速度最大不得超过20
+            //Control the range of the velocity.
             movement = movement > 20 ? 20 : movement;
-            //速度最小不得低于0.7V0
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
             List<TTLHelper> ttls = new List<TTLHelper>();
             foreach (var obj in stl.entity.ObjectInSight)
@@ -342,7 +417,9 @@ namespace Ecosystem.controller
             }
             TTLHelper predator = ttls[0];
             double disOfMaxIndex = 50;
-            //根据附近的捕食者的位置和它的状态综合考虑，选择最有可能追到stl的第三营养级
+            /*According to the location of predators and their state,
+             *find the predator that is most likely to catch up with the current entity.
+             */
             for (int i = 0; i < ttls.Count; i++)
             {
 
@@ -354,13 +431,14 @@ namespace Ecosystem.controller
                 }
             }
 
-            //朝着远离上文求出的捕食者的方向移动
+            //Move away from the predator found above
             double Left = (stl.location.Left - predator.location.Left) * movement / disOfMaxIndex + stl.location.Left;
             double Top = (stl.location.Top - predator.location.Top) * movement / disOfMaxIndex + stl.location.Top;
             stl.entity.Energy -= movement;
             stl.entity.Tiredness += movement * 0.5;
             if (0 <= Left && Left <= 990 && 0 <= Top && Top <= 490) { Moving(stl, Left - stl.location.Left, Top - stl.location.Top); return; }
 
+            //Check for crossing the boundaries. If so, change the direction to move.
             List<Location> locations = new List<Location>();
             double angle = Math.Atan2(stl.location.Top - predator.location.Top, stl.location.Left - predator.location.Left) * 180 / Math.PI;
             for(int i = 0; i <=150; i+=30)
@@ -381,13 +459,24 @@ namespace Ecosystem.controller
                 }
             }
 
+            //Update the state.
             stl.entity.Energy -= movement * 1.5;
             stl.entity.Tiredness += movement * 0.1;
             stl.entity.Tiredness = stl.entity.Tiredness < 0 ? 0 : stl.entity.Tiredness;
         }
 
+        /**
+         * Function: Get the sum of squares of two double number
+         * Input: double number x and y
+         * Output: an double number
+         */
         public static double SqrtSumSquare(double x, double y) => Math.Sqrt(x * x + y * y);
 
+        /**
+         * Function: Control the second nutritional level's animals to go hunting
+         * Input: The object represents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void STLHunt(STLHelper stl)
         {
             List<FNLHelper> alternativeGrass = new List<FNLHelper>();
@@ -398,13 +487,13 @@ namespace Ecosystem.controller
             }
             int targetGrass_index = 0;
 
-            //假如视野范围里没有草，扩大搜索范围向外寻找
+            // If there is no plant in its sight, it expands its searching range.
             if (alternativeGrass.Count == 0)
             {
                 STLSeek(stl);
                 return;
             }
-            // 直接选距离它最近的草吃
+            // Select the plant that is closest to itself as its hunting target.
             double min_distance = SqrtSumSquare(stl.location.Left - alternativeGrass[0].location.Left, stl.location.Top - alternativeGrass[0].location.Top);
             if (alternativeGrass.Count >= 2)
             {
@@ -417,22 +506,31 @@ namespace Ecosystem.controller
                     }
                 }
             }
-            //假如视野范围里没有草，扩大搜索范围向外寻找
 
-            //设置速度阈值为15
-            double V0 = 35;
-            //根据那个公式得出速度的最大值，这里a设为0.1
+            //Calculate the velocity according to the formula.
+            double V0 = 0;
+            switch (SecondChoice)
+            {
+                case SecondLevel.Horse:
+                    V0 = 35;
+                    break;
+                case SecondLevel.Rabbit:
+                    V0 = 30;
+                    break;
+                case SecondLevel.Sheep:
+                    V0 = 33;
+                    break;
+            }
             double Vmax = V0 + 0.1 * stl.entity.State;
-            //在0.7的速度阈值与最大值之间随机选择一个值作为当前速度，因为运动时间为1秒，速度与移动距离movement相等
             double movement = 0.7 * V0 + new Random().NextDouble() * (Vmax - 0.7 * V0);
-            //速度最大不得超过20
+            //Control the range of the velocity.
             movement = movement > 20 ? 20 : movement;
-            //速度最小不得低于0.7V0
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
 
-            //根据比例让当前生物朝目标猎物的方向移动movement的距离
+            //The current entity move towards the direction of the target prey according to the proportion.
             double LeftOffset = (alternativeGrass[targetGrass_index].location.Left - stl.location.Left) * movement / min_distance;
             double TopOffset = (alternativeGrass[targetGrass_index].location.Top - stl.location.Top) * movement / min_distance;
+            //Check for crossing boundaries 
             if (stl.location.Left + LeftOffset < 0)
             {
                 LeftOffset = 0 - stl.location.Left;
@@ -452,22 +550,27 @@ namespace Ecosystem.controller
             Moving(stl, LeftOffset, TopOffset);
             Chase21(stl, alternativeGrass[targetGrass_index]);
 
-            //直接在这里更新能量和疲劳度，因为在update那里很难获取移动距离
+            // Update
             stl.entity.Energy -= movement * 1.5;
             stl.entity.Tiredness += movement * 0.1;
             stl.entity.Tiredness=stl.entity.Tiredness < 0 ? 0:stl.entity.Tiredness;
         }
 
+        /**
+         * Function: Control the third nutritional level's animals to go hunting
+         * Input: The object represents the entity at third nutritional level.
+         * Output: Empty
+         */
         public static void TTLHunt(TTLHelper ttl)
         {
-            List<STLHelper> alternativePreys = new List<STLHelper>();   // 猎物备选项
+            List<STLHelper> alternativePreys = new List<STLHelper>();   // preys that can be chosen as the hunting target
             foreach (var o in ttl.entity.ObjectInSight)
             {
                 if (o is STLHelper)
                     alternativePreys.Add(o as STLHelper);
             }
-            int targetPrey_index = 0;   // 选定的目标猎物的index
-            //假如视野范围里没有猎物，扩大搜索范围向外寻找
+            int targetPrey_index = 0;
+            // If there is no prey in its sight, it expands its searching range.
             if (alternativePreys.Count == 0)
             {
                 TTLSeek(ttl);
@@ -476,7 +579,7 @@ namespace Ecosystem.controller
 
             if (ttl.entity.Energy < ThirdTrophicLevel.THRES_ENERGY * 0.4)   // extremely hungry; 参数0.4后期调整
             {
-                // 此时它极度饥饿，所以不考虑那么多，直接捕距离它最近的
+                // Now it is extremely hungry. Thus it chooses the prey that is closest to itself in order to get some food as soon as possible.
                 double min_distance = SqrtSumSquare(ttl.location.Left - alternativePreys[0].location.Left, ttl.location.Top - alternativePreys[0].location.Top);
                 if (alternativePreys.Count >= 2)
                 {
@@ -492,7 +595,7 @@ namespace Ecosystem.controller
             }
             else    // hungry but not too hungry
             {
-                // 此时它轻度饥饿，选择视野里状态最差的第二营养级作为目标猎物
+                // Now it is slightly hungry. Thus it chooses the prey with the poorest state as its hunting target, which is beneficial for sustainable development.
                 double least_state = alternativePreys[0].entity.State;
                 if (alternativePreys.Count >= 2)
                 {
@@ -506,23 +609,30 @@ namespace Ecosystem.controller
                     }
                 }
             }
-            //设置速度阈值为20，比第二营养级快，使第三营养级能够追上第二营养级
-            double V0 = 40;
-            //根据那个公式得出速度的最大值，这里a设为0.1
+            //Calculate the velocity according to the formula.
+            double V0 = 0;
+            switch (ThirdChoice)
+            {
+                case ThirdLevel.Tiger:
+                    V0 = 45;
+                    break;
+                case ThirdLevel.Wolf:
+                    V0 = 40;
+                    break;
+            }
             double Vmax = V0 + 0.1 * ttl.entity.State;
-            //在0.7的速度阈值与最大值之间随机选择一个值作为当前速度，因为运动时间为1秒，速度与移动距离movement相等
             double movement = 0.7 * V0 + new Random().NextDouble() * (Vmax - 0.7 * V0);
-            //速度最大不得超过25
+            //Control the range of the velocity.
             movement = movement > 25 ? 25 : movement;
-            //速度最小不得低于0.7V0
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
 
-            //计算猎物与当前的距离
+            //Calculate the distance
             double dis = SqrtSumSquare(alternativePreys[targetPrey_index].location.Left - ttl.location.Left, alternativePreys[targetPrey_index].location.Top - ttl.location.Top);
 
-            //根据比例让当前生物朝目标猎物的方向移动movement的距离
+            //The current entity move towards the direction of the target prey according to the proportion.
             double LeftOffset = (alternativePreys[targetPrey_index].location.Left - ttl.location.Left) * movement / dis;
             double TopOffset = (alternativePreys[targetPrey_index].location.Top - ttl.location.Top) * movement / dis;
+            //Check for crossing boundaries 
             if (ttl.location.Left + LeftOffset < 0)
             {
                 LeftOffset = 0 - ttl.location.Left;
@@ -542,17 +652,22 @@ namespace Ecosystem.controller
             Moving(ttl, LeftOffset, TopOffset);
             Chase32(ttl, alternativePreys[targetPrey_index]);
 
-            //直接在这里更新能量和疲劳度，因为在update那里很难获取移动距离
+            //Update
             ttl.entity.Energy -= movement;
             ttl.entity.Tiredness += movement * 0.1;
             ttl.entity.Tiredness = ttl.entity.Tiredness < 0 ? 0 : ttl.entity.Tiredness;
         }
 
+        /**
+         * Function:When there is no prey in the visiom,use this function to search for prey outward. Other settings are the same as Hunt funtion.
+         * Input: The object represents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void STLSeek(STLHelper stl)
         {
-            //当饥饿找不到食物时，使用这个函数向外搜索食物。其实就是将视野扩展到全局，直接全局搜索食物，其他设置与捕食相同。
             FNLHelper prey = null;
             double disOfMiniIndex = 50;
+            //Search the prey in the expanded vision.
             foreach (var o in GlobalObject.AllAnimal)
             {
                 if (o is FNLHelper)
@@ -572,9 +687,23 @@ namespace Ecosystem.controller
                     }
                 }
             }
-            double V0 = 25;
+            //Calculate the velocity of the entity based on the formula. 
+            double V0 = 0;
+            switch (SecondChoice)
+            {
+                case SecondLevel.Horse:
+                    V0 = 35;
+                    break;
+                case SecondLevel.Rabbit:
+                    V0 = 30;
+                    break;
+                case SecondLevel.Sheep:
+                    V0 = 33;
+                    break;
+            }
             double Vmax = V0 + 0.1 * stl.entity.State;
             double movement = 0.7 * V0 + new Random().NextDouble() * (Vmax - 0.7 * V0);
+            //Control the range of the velocity.
             movement = movement > 20 ? 20 : movement;
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
             if (prey == null)
@@ -585,16 +714,22 @@ namespace Ecosystem.controller
             double LeftOffset = (prey.location.Left - stl.location.Left) * movement / disOfMiniIndex;
             double TopOffset = (prey.location.Top - stl.location.Top) * movement / disOfMiniIndex;
             Moving(stl, LeftOffset, TopOffset);
+            //Update some parameters.
             stl.entity.Energy -= movement * 1.5;
             stl.entity.Tiredness += movement * 0.1;
             stl.entity.Tiredness = stl.entity.Tiredness < 0 ? 0 : stl.entity.Tiredness;
         }
 
+        /**
+         * Function:When there is no prey in the visiom,use this function to search for prey outward. Other settings are the same as Hunt funtion.
+         * Input: The object represents the entity at third nutritional level.
+         * Output: Empty
+         */
         public static void TTLSeek(TTLHelper ttl)
         {
-            //当饥饿找不到食物时，使用这个函数向外搜索食物。其实就是将视野扩展到全局，直接全局搜索食物，其他设置与捕食相同。
             STLHelper prey = null;
             double disOfMiniIndex = 50;
+            //Search the prey in the expanded vision.
             foreach (var o in GlobalObject.AllAnimal)
             {
                 if (o is STLHelper)
@@ -614,9 +749,20 @@ namespace Ecosystem.controller
                     }
                 }
             }
-            double V0 = 30;
+            //Calculate the velocity of the entity based on the formula. 
+            double V0 = 0;
+            switch (ThirdChoice)
+            {
+                case ThirdLevel.Tiger:
+                    V0 = 45;
+                    break;
+                case ThirdLevel.Wolf:
+                    V0 = 40;
+                    break;
+            }
             double Vmax = V0 + 0.1* ttl.entity.State;
             double movement = 0.7 * V0 + new Random().NextDouble() * (Vmax - 0.7 * V0);
+            //Control the range of the velocity.
             movement = movement > 25 ? 25 : movement;
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
             if (prey == null)
@@ -627,35 +773,51 @@ namespace Ecosystem.controller
             double LeftOffset = (prey.location.Left - ttl.location.Left) * movement / disOfMiniIndex;
             double TopOffset = (prey.location.Top - ttl.location.Top) * movement / disOfMiniIndex;
             Moving(ttl, LeftOffset, TopOffset);
+            //Update some parameters.
             ttl.entity.Energy -= movement;
             ttl.entity.Tiredness += movement * 0.1;
             ttl.entity.Tiredness = ttl.entity.Tiredness < 0 ? 0 : ttl.entity.Tiredness;
         }
 
+        /**
+         * Function: Realize the random movement for the entity if they don't choose any other actions.
+         * Input: The object represents the entity at second nutritional level.
+         * Output: Empty
+         */
         public static void STLRun(STLHelper stl)
         {
             var rand = new Random();
-            //设置速度阈值为15
-            double V0 = 35;
-            //根据那个公式得出速度的最大值，这里a设为0.1
+            //Set the speed threshold to 15
+            double V0 = 0;
+            switch (SecondChoice)
+            {
+                case SecondLevel.Horse:
+                    V0 = 35;
+                    break;
+                case SecondLevel.Rabbit:
+                    V0 = 30;
+                    break;
+                case SecondLevel.Sheep:
+                    V0 = 33;
+                    break;
+            }
+            //Calculate the maximum velocity of the 
             double Vmax = V0 + 0.1 * stl.entity.State;
-            //在0.7的速度阈值与最大值之间随机选择一个值作为当前速度，因为运动时间为1秒，速度与移动距离movement相等
+            /*Randomly select a value between the speed threshold of 0.7 and the maximum value as the current speed, 
+             *because the movement time is 1 second, and the speed is equal to the movement distance.
+             */
             double movement = 0.7 * V0 + rand.NextDouble() * (Vmax - 0.7 * V0);
-            //速度最大不得超过20
+            //The speed can not beyond 20.
             movement = movement > 20 ? 20 : movement;
-            //速度最小不得低于0.7V0
+            //The speed can not be smaller than 0.7*V0.
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
 
-            //随便寻找一个角度为方向让生物移动
-            //double angle = new Random().NextDouble() * 360;
-            //double Left = stl.location.Left + movement * Math.Sin(angle);
-            //double Top = stl.location.Top + movement * Math.Cos(angle);
-
+            //Randomly select one angle which is closer to the previous to move to prevent moving back and forth .
             stl.angle = rand.Next(stl.angle - 50, stl.angle + 50);
             double Left = stl.location.Left + movement * Math.Sin(stl.angle * Math.PI / 180);
             double Top = stl.location.Top + movement * Math.Cos(stl.angle * Math.PI / 180);
 
-            //越界判断
+            //Check for crossing the boundaries.
             if (Left < 0)
             {
                 Left = 0 - Left;
@@ -676,31 +838,49 @@ namespace Ecosystem.controller
                 Top = 2 * 490 - Top;
                 stl.angle += 90;
             }
+            //Update some parameters
             Moving(stl, Left - stl.location.Left, Top - stl.location.Top);
             stl.entity.Energy -= movement * 1.5;
             stl.entity.Tiredness += movement * 0.1;
             stl.entity.Tiredness = stl.entity.Tiredness < 0 ? 0 : stl.entity.Tiredness;
         }
 
+        /**
+         * Function: Realize the random movement for the entity if they don't choose any other actions.
+         * Input: The object represents the entity at third nutritional level.
+         * Output: Empty
+         */
         public static void TTLRun(TTLHelper ttl)
         {
+            //Randomly select one angle which is closer to the previous to move to prevent moving back and forth .
             var rand = new Random();
-            //设置速度阈值为15
-            double V0 = 35;
-            //根据那个公式得出速度的最大值，这里a设为0.1
+            //Set the speed threshold to 15
+            double V0 = 0;
+            switch (ThirdChoice)
+            {
+                case ThirdLevel.Tiger:
+                    V0 = 45;
+                    break;
+                case ThirdLevel.Wolf:
+                    V0 = 40;
+                    break;
+            }
+            //Calculate the maximum velocity of the 
             double Vmax = V0 + 0.1 * ttl.entity.State;
-            //在0.7的速度阈值与最大值之间随机选择一个值作为当前速度，因为运动时间为1秒，速度与移动距离movement相等
+            /*Randomly select a value between the speed threshold of 0.7 and the maximum value as the current speed, 
+             *because the movement time is 1 second, and the speed is equal to the movement distance.
+             */
             double movement = 0.7 * V0 + rand.NextDouble() * (Vmax - 0.7 * V0);
-            //速度最大不得超过20
+            //The speed can not beyond 20.
             movement = movement > 20 ? 20 : movement;
-            //速度最小不得低于0.7V0
+            //The speed can not be smaller than 0.7*V0.
             movement = movement < 0.7 * V0 ? 0.7 * V0 : movement;
 
-            //随便寻找一个角度为方向让生物移动
+            //Randomly select one angle which is closer to the previous to move to prevent moving back and forth .
             ttl.angle = rand.Next(ttl.angle - 50, ttl.angle + 50);
             double Left = ttl.location.Left + movement * Math.Sin(ttl.angle * Math.PI / 180);
             double Top = ttl.location.Top + movement * Math.Cos(ttl.angle * Math.PI / 180);
-            //越界判断
+            //Check for crossing the boundaries.
             if (Left < 0)
             {
                 Left = 0 - Left;
@@ -721,6 +901,7 @@ namespace Ecosystem.controller
                 Top = 2 * 490 - Top;
                 ttl.angle += 90;
             }
+            // Update
             Moving(ttl, Left - ttl.location.Left, Top - ttl.location.Top);
             ttl.entity.Energy -= movement;
             ttl.entity.Tiredness += movement * 0.1;

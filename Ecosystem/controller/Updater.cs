@@ -11,20 +11,24 @@ namespace Ecosystem.controller
 {
     public class Updater
     {
+        /**
+         * Function: Control the life and death of all livings and update their basic attributes (some attributes are not updated here since passing relevant parameters is quite hard)
+         * Input: Empty
+         * Output: Emtpy
+         */
         public static void UpdateState()
         {
             AllAnimal.RemoveAll(o =>
             {
                 switch (o)
                 {
-                    //因为繁殖改成5个tick一次了，这里也改成5个tick增加一岁
                     case FNLHelper fnl:
                         {
-                            if (count20 % 5 == 1)    // 每20个tick周期的末尾，年龄增长一岁
+                            if (count20 % 5 == 1)    // The age increases by one every 5 tick
                             {
                                 fnl.entity.Age++;
                                 if (fnl.entity.Age == FirstNutritionalLevel.MAX_AGE)
-                                // 到寿命了，自然死亡
+                                // The age reaches its lifetime and it dies naturally
                                 {
                                     canvasObject.Children.Remove(fnl.shape);
                                     FirstNutritionalLevel.Count--;
@@ -32,10 +36,10 @@ namespace Ecosystem.controller
                                 }
                             }
 
-                            fnl.entity.StateUpdate();  // (类中的成员函数)更新阳光储存量、水分储存量
+                            fnl.entity.StateUpdate();  // updates the relevant attributes of plants.
 
                             if (fnl.entity.Illumination < FirstNutritionalLevel.THRES_ILLUMINATION || fnl.entity.Moisture < FirstNutritionalLevel.THRES_MOISTURE)
-                            // 如果阳光储存量或水分储存量严重不足，它就死翘翘了
+                            // It will die if the illumination storage or moisture storage is inadequate very seriously
                             {
                                 canvasObject.Children.Remove(fnl.shape);
                                 FirstNutritionalLevel.Count--;
@@ -46,24 +50,22 @@ namespace Ecosystem.controller
                         break;
                     case STLHelper stl:
                         {
-                            if (count20 % 5 == 1)    // 每20个tick周期的末尾，年龄增长一岁
+                            if (count20 % 5 == 1)    // The age increases by one every 5 tick
                             {
                                 stl.entity.Age++;
                                 if (stl.entity.Age == SecondTrophicLevel.MAX_AGE)
-                                // 到寿命了，自然死亡
+                                // The age reaches its lifetime and it dies naturally
                                 {
                                     canvasObject.Children.Remove(stl.shape);
-                                    //AllAnimal.Remove(stl);
                                     SecondTrophicLevel.Count--;
                                     return true;
                                 }
                             }
 
                             if (stl.entity.Energy <= 250 || stl.entity.Tiredness > SecondTrophicLevel.MAX_TIREDNESS)
-                            // 饿死了或累死了
+                            // Die of hunger or die of exhaustion
                             {
                                 canvasObject.Children.Remove(stl.shape);
-                                //AllAnimal.Remove(stl);
                                 SecondTrophicLevel.Count--;
                                 return true; 
                             }
@@ -72,24 +74,22 @@ namespace Ecosystem.controller
                         break;
                     case TTLHelper ttl:
                         {
-                            if (count20 % 5 == 1)    // 每20个tick周期的末尾，年龄增长一岁
+                            if (count20 % 5 == 1)    // The age increases by one every 5 tick
                             {
                                 ttl.entity.Age++;
                                 if (ttl.entity.Age == ThirdTrophicLevel.MAX_AGE)
-                                // 到寿命了，自然死亡
+                                // The age reaches its lifetime and it dies naturally
                                 {
                                     canvasObject.Children.Remove(ttl.shape);
-                                    //AllAnimal.Remove(ttl);
                                     ThirdTrophicLevel.Count--;
                                     return true;
                                 }
                             }
 
                             if (ttl.entity.Energy <= 250 || ttl.entity.Tiredness > ThirdTrophicLevel.MAX_TIREDNESS)
-                            // 饿死了或累死了
+                            // Die of hunger or die of exhaustion
                             {
                                 canvasObject.Children.Remove(ttl.shape);
-                                //AllAnimal.Remove(ttl);
                                 ThirdTrophicLevel.Count--;
                                 return true;
                             }
@@ -99,17 +99,6 @@ namespace Ecosystem.controller
                 }
                 return false;
             });
-            //return Task.CompletedTask;
         }
-
-
-        /*
-            其它说明：
-                （1）若动物在本tick内，选择原地休息的抉择，虽然执行上述步骤后状态没有更新，但在stay行为函数中已有更新。
-                （2）由于捕食者捕到猎物的时刻，不一定刚好在一个tick结束时，也考虑到参数传来传去很麻烦，还容易出bug，
-                     所以当捕食者捕到猎物，“捕食者的饱食度增益”这一项状态更新，放在了chase32和chase21函数中实现
-                     (Updater里没有考虑吃掉猎物后的饱食度增益)，
-                     毕竟判断各个时刻捕食成功与否，都在这2个chase函数里。
-        */
     }
 }

@@ -39,6 +39,16 @@ public static class GlobalObject
     public static double ratioOfSecond;
     public static double ratioOfThird;
 
+    public enum Action
+    {
+        Escape = 0,
+        Stay = 1,
+        Hunt = 2,
+        Run = 3,    // random direction moving
+        GetTogether = 4,
+        Seek = 5,
+    }
+
     public static ClassLibrary.classes.Environment.Weather GlobalWeather;
 
     //A set of all animal
@@ -47,6 +57,7 @@ public static class GlobalObject
     //control
     public static Canvas canvasObject;
     public static Border border;
+    public static Image image;
 
     //constant
     public const double MAX_SIGHT_RANGE = 50;
@@ -65,18 +76,29 @@ public static class GlobalObject
 
     public static Ellipse circle;
 
+    /**
+     * Function: create random integer
+     * Input: the max integer that could be created and the min integer that could be created
+     * Output: an random number between maxNumber and minNumber
+     */
     public static int CreateRandomNumber(int maxNumber, int minNumber = 0)
     {
         var random = new Random();
         return random.Next(minNumber, maxNumber);
     }
 
+    /**
+     * Function: overload of the above function to create random double number
+     */
     public static double CreateRandomNumber(double width, double start = 0.0)
     {
         var random = new Random();
         return random.NextDouble() * width + start;
     }
 
+    /**
+     * Function: to store the object of three windows, including setting screen, main screen and control panel
+     */
     public class WindowObject
     {
         private WindowObject(){}
@@ -94,6 +116,11 @@ public static class GlobalObject
             
     }
 
+    /**
+     * Function: Start the process
+     * Input: Empty
+     * Output: Empty
+     */
     public static async void ToStart()
     {
         while (!Stop)
@@ -115,6 +142,11 @@ public static class GlobalObject
         
     }
 
+    /**
+     * Function: Add instantaneous data into the statistic list
+     * Input: Empty
+     * Output: Empty
+     */
     public static void Statistics()
     {
         FNLStatistics.Add(FirstNutritionalLevel.Count);
@@ -123,6 +155,11 @@ public static class GlobalObject
         TickStatistics.Add(count20);
     }
 
+    /**
+     * Function: Create motion in x-axis for animals in second trophic level
+     * Input: object of entity, start position, end position, duration, path property
+     * Output: Empty
+     */
     public static void CreateMotionX(STLHelper obj, double start, double end, double duration, PropertyPath propertyPath)
     {
         obj.doubleAnimationX.From = start;
@@ -132,6 +169,12 @@ public static class GlobalObject
         Storyboard.SetTargetProperty(obj.doubleAnimationX, propertyPath);
         
     }
+
+    /**
+     * Function: Create motion in x-axis for animals in third trophic level
+     * Input: object of entity, start position, end position, duration, path property
+     * Output: Empty
+     */
     public static void CreateMotionX(TTLHelper obj, double start, double end, double duration, PropertyPath propertyPath)
     {
         obj.doubleAnimationX.From = start;
@@ -140,6 +183,12 @@ public static class GlobalObject
         Storyboard.SetTarget(obj.doubleAnimationX, obj.shape);
         Storyboard.SetTargetProperty(obj.doubleAnimationX, propertyPath);
     }
+
+    /**
+     * Function: Create motion in y-axis for animals in second trophic level
+     * Input: object of entity, start position, end position, duration, path property
+     * Output: Empty
+     */
     public static void CreateMotionY(STLHelper obj, double start, double end, double duration, PropertyPath propertyPath)
     {
         obj.doubleAnimationY.From = start;
@@ -148,6 +197,12 @@ public static class GlobalObject
         Storyboard.SetTarget(obj.doubleAnimationY, obj.shape);
         Storyboard.SetTargetProperty(obj.doubleAnimationY, propertyPath);
     }
+
+    /**
+     * Function: Create motion in y-axis for animals in third trophic level
+     * Input: object of entity, start position, end position, duration, path property
+     * Output: Empty
+     */
     public static void CreateMotionY(TTLHelper obj, double start, double end, double duration, PropertyPath propertyPath)
     {
         obj.doubleAnimationY.From = start;
@@ -160,6 +215,7 @@ public static class GlobalObject
     /*
      * Moving function
      * Input: instance, direction of x and y
+     * Output: Empty
      */
     public static void Moving(object obj, double XDirection, double YDirection)
     {
@@ -197,9 +253,11 @@ public static class GlobalObject
                 break;
         }
     }
+
     /*
-     * CreateShape function
+     * Function: Create Shape in the main screen
      * Input: color, x position and y position
+     * Output: Empty
      */
     public static Shape CreateShape(Brush brush, double left, double top)
     {
@@ -266,8 +324,19 @@ public static class GlobalObject
         return shape;
     }
 
+    
+    /**
+     * Function: compute the sum of squares of two number
+     * Input: two double number
+     * Output: an double number
+     */
     public static double SquSum(double x, double y) => Math.Sqrt(x * x + y * y);
 
+    /**
+     * Function: time for chase32
+     * Input: an entity object
+     * Output: Empty
+     */
     public static async void Timer3(TTLHelper ttl)
     {
         ttl.flag = false;
@@ -275,6 +344,11 @@ public static class GlobalObject
         ttl.flag = true;
     }
 
+    /**
+     * Function: time for chase21
+     * Input: an entity object
+     * Output: Empty
+     */
     public static async void Timer2(STLHelper stl)
     {
         stl.flag = false;
@@ -283,8 +357,9 @@ public static class GlobalObject
     }
 
     /*
-     * Chase function
-     * When calling this function, ttl will chase stl for 1 second.
+     * Function: When calling this function, ttl will chase stl within 1 second.
+     * Input: TTLHelper and STLHelper
+     * Output: Empty
      */
     public static async void Chase32(TTLHelper ttl, STLHelper stl)
     {
@@ -321,9 +396,11 @@ public static class GlobalObject
         });
     }
 
-    /*
+    /**
      * Chase function
      * When calling this function, stl will hunt fnl for 1 second.
+     * Input: STLHelper and FNLHelper
+     * Output: Empty
      */
     public static async void Chase21(STLHelper stl, FNLHelper fnl)
     {
@@ -336,9 +413,6 @@ public static class GlobalObject
                 {
                     if (canvasObject.Children.Contains(fnl.shape))
                     {
-                        //var dist = stl.shape.TranslatePoint(new Point(), stl.shape);
-                        //var (distX, distY) = (stl.location.Left - fnl.location.Left,
-                        //    stl.location.Top - fnl.location.Top);
                         var dist = stl.shape.TranslatePoint(new Point(), fnl.shape);
                         if (SquSum(dist.X, dist.Y) < 5)
                         {

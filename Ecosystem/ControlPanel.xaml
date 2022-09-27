@@ -4,15 +4,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ecosystem"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
-        Title="ControlPanel" Height="500" Width="300" ResizeMode="NoResize">
+        Title="ControlPanel" Height="594" Width="359" ResizeMode="NoResize">
     <Grid>
-        <Button x:Name="btn_start" Content="Start" HorizontalAlignment="Left" Margin="44,36,0,0" VerticalAlignment="Top" Click="start_click"/>
-        <Button x:Name="btn_stop" Content="Stop" HorizontalAlignment="Left" Margin="104,36,0,0" 
+        <Button x:Name="btn_start" Content="Start" HorizontalAlignment="Left" Margin="34,31,0,0" VerticalAlignment="Top" Click="start_click"/>
+        <Button x:Name="btn_stop" Content="Stop" HorizontalAlignment="Left" Margin="129,31,0,0" 
                 VerticalAlignment="Top" Click="stop_click" IsEnabled="False"/>
-        <GroupBox Header="Animal information" Margin="34,134,34,43">
+        <GroupBox Header="Animal information" Margin="34,178,34,25">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
                     <RowDefinition></RowDefinition>
@@ -39,31 +41,23 @@
                 <TextBlock x:Name="x_location" Text="------" Grid.Row="5" Grid.Column="1" VerticalAlignment="Center" Foreground="Gray" TextWrapping="WrapWithOverflow"/>
                 <Label Content="y" Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
                 <TextBlock x:Name="y_location" Text="------" Grid.Row="6" Grid.Column="1" VerticalAlignment="Center" Foreground="Gray" TextWrapping="WrapWithOverflow"/>
+                <Label Content="action" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                <TextBlock x:Name="action_label" Text="------" Grid.Row="7" Grid.Column="1" VerticalAlignment="Center" Foreground="Gray" TextWrapping="WrapWithOverflow"/>
             </Grid>
         </GroupBox>
-        <Button Content="Generate statistics report" HorizontalAlignment="Left" Margin="10,71,0,0" VerticalAlignment="Top" Click="Statistics_Click"/>
-        <TextBox x:Name="fileNameBox" HorizontalAlignment="Left" Margin="169,71,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="113" ToolTip="" Height="19">
-            <TextBox.Resources>
-                <VisualBrush x:Key="HelpBrush" TileMode="None" Opacity="0.3" Stretch="None" AlignmentX="Left">
-                    <VisualBrush.Visual>
-                        <TextBlock  Text="Filename"/>
-                    </VisualBrush.Visual>
-                </VisualBrush>
-            </TextBox.Resources>
-            <TextBox.Style>
-                <Style TargetType="TextBox">
-                    <Style.Triggers>
-                        <Trigger Property="Text" Value="{x:Null}">
-                            <Setter Property="Background" Value="{StaticResource HelpBrush}"/>
-                        </Trigger>
-                        <Trigger Property="Text" Value="">
-                            <Setter Property="Background" Value="{StaticResource HelpBrush}"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBox.Style>
-        </TextBox>
-        <Button x:Name="btn_cancel" Content="Cancel information" Margin="135,110,34,0" VerticalAlignment="Top" Click="btn_cancel_Click"/>
-
+        <Button Content="Generate report" HorizontalAlignment="Left" Margin="180,80,0,0" VerticalAlignment="Top" Click="Statistics_Click" />
+        <TextBox Margin="34,73,0,0"
+                 x:Name="fileNameBox" HorizontalAlignment="Left" VerticalAlignment="Top"
+                 materialDesign:HintAssist.Hint="FileName"
+                 materialDesign:HintAssist.FloatingScale="0.50"
+                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                 FontSize="16" Cursor="Arrow" Width="119"/>
+        <Button x:Name="btn_cancel" Content="Cancel information" Margin="34,131,135,0" VerticalAlignment="Top" Click="btn_cancel_Click"/>
+        <Button
+            Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+            HorizontalAlignment="Left" Click="help_click" Margin="285,10,0,504" Cursor="Hand">
+            <materialDesign:PackIcon
+                Kind="Help" />
+        </Button>
     </Grid>
 </Window>

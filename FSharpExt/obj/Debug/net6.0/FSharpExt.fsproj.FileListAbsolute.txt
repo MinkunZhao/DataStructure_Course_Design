@@ -38,3 +38,23 @@ E:\wpf try\project(6)\project\FSharpExt\obj\Debug\net6.0\FSharpExt.AssemblyInfo.
 E:\wpf try\project(6)\project\FSharpExt\obj\Debug\net6.0\FSharpExt.dll
 E:\wpf try\project(6)\project\FSharpExt\obj\Debug\net6.0\FSharpExt.xml
 E:\wpf try\project(6)\project\FSharpExt\obj\Debug\net6.0\FSharpExt.pdb
+E:\wpf try\project\FSharpExt\bin\Debug\net6.0\FSharpExt.deps.json
+E:\wpf try\project\FSharpExt\bin\Debug\net6.0\FSharpExt.dll
+E:\wpf try\project\FSharpExt\bin\Debug\net6.0\FSharpExt.pdb
+E:\wpf try\project\FSharpExt\bin\Debug\net6.0\FSharpExt.xml
+E:\wpf try\project\FSharpExt\obj\Debug\net6.0\FSharpExt.fsproj.AssemblyReference.cache
+E:\wpf try\project\FSharpExt\obj\Debug\net6.0\FSharpExt.AssemblyInfoInputs.cache
+E:\wpf try\project\FSharpExt\obj\Debug\net6.0\FSharpExt.AssemblyInfo.fs
+E:\wpf try\project\FSharpExt\obj\Debug\net6.0\FSharpExt.dll
+E:\wpf try\project\FSharpExt\obj\Debug\net6.0\FSharpExt.xml
+E:\wpf try\project\FSharpExt\obj\Debug\net6.0\FSharpExt.pdb
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\bin\Debug\net6.0\FSharpExt.deps.json
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\bin\Debug\net6.0\FSharpExt.dll
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\bin\Debug\net6.0\FSharpExt.pdb
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\bin\Debug\net6.0\FSharpExt.xml
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\obj\Debug\net6.0\FSharpExt.fsproj.AssemblyReference.cache
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\obj\Debug\net6.0\FSharpExt.AssemblyInfoInputs.cache
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\obj\Debug\net6.0\FSharpExt.AssemblyInfo.fs
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\obj\Debug\net6.0\FSharpExt.dll
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\obj\Debug\net6.0\FSharpExt.xml
+D:\Data Structures and Algorithm Analysis in C++\Project\project\FSharpExt\obj\Debug\net6.0\FSharpExt.pdb

@@ -12,19 +12,17 @@ namespace Ecosystem.controller
 {
     public class Detector
     {
+        /**
+         * Function: Let every animal detect animal in their view, that is, to push animals in their view into their detection set
+         * Input: Empty
+         * Output: Empty
+         */
         public static async Task Detect()
         {
             await Task.Run(() =>
             {
                 foreach (var animal in AllAnimal.ToArray())
                 {
-                    /*
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        var textbox= WindowObject.GetWindow().panel.test;
-                        textbox.AppendText("l");
-                    });
-                    */
                     switch (animal)
                     {
                         case STLHelper obj1:
@@ -121,6 +119,11 @@ namespace Ecosystem.controller
             });
         }
 
+        /**
+         * Function: Get the sum of squares of two double number
+         * Input: double number x and y
+         * Output: an double number
+         */
         public static double SqrtSumSquare(double x, double y)
         {
             return Math.Sqrt(x * x + y * y);

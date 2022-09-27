@@ -42,18 +42,21 @@ module public Ext =
             Scatter(
                 x = ticks,
                 y = fnlStatistics,
+                marker = Marker(color = "rgb(0, 128, 0)"),
                 name = "First nutritional level"
             )
         let trace2 =
             Scatter(
                 x = ticks,
                 y = stlStatistics,
+                marker = Marker(color = "rgb(0, 0, 255)"),
                 name = "Second trophic level"
             )
         let trace3 =
             Scatter(
                 x = ticks,
                 y = ttlStatistics,
+                marker = Marker(color = "rgb(255, 0, 0)"),
                 name = "Third trophic level"
             )
         let styledLayout =
